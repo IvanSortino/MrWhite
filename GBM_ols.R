@@ -1,5 +1,6 @@
 rm(list = ls())
 graphics.off()
+
 library(tidyverse)
 library(tidyquant)
 
@@ -18,11 +19,14 @@ close_plot_june <- ggplot(close_price_june, aes(date, AAPL)) +
   labs(x = 'Date')
 close_plot_june
 
-rets <- close_price_june %>% select(AAPL) %>% pull() %>%  RETURN() # tidyquant package
+rets <- close_price_june %>% select(AAPL) %>% pull() %>%  RETURN() 
 rets <- rets[-1]
 mu <- mean(rets) 
 sigma <- sd(rets)
 s0 <- close_price %>% filter(date == "2019-06-28") %>% pull()
+
+# In the following code we have created a matrix in which rows represent each observation at time t
+# while in columns there are the simulations 
 
 gbm_fun <- function(nsim, t, mu, sigma, S0, dt) {
   gbm <- matrix(ncol = nsim, nrow = t)
@@ -47,6 +51,9 @@ gbm_df %>%
   geom_line() +
   theme(legend.position = 'none')
 
+# Here we want to find the better and worst model for our stock series. To achieve this aim 
+# we have minimized the sum of the square error 
+
 close_price_july <- close_price %>% filter(date >= "2019-06-28")
 close_price_july <- select(close_price_july[1:30, ], 'AAPL')
 close_price_july <- as.matrix(close_price_july)
@@ -56,21 +63,14 @@ for (i in 1:ncol(gbm)) {
   diff_mat[, i] <- close_price_july - gbm[, i]
 }
 
-MAPE <- colSums(diff_mat ^ 2)
-best_MAPE <- min(MAPE)
-best_MAPE_position <- which(MAPE == best_MAPE)
-best_forecast <- gbm[, best_MAPE_position]
+ols <- colSums(diff_mat ^ 2)
+best_ols <- min(ols)
+best_ols_position <- which(ols == best_ols)
+best_forecast <- gbm[, best_ols_position]
 
-# Aggiunta la parte del peggiore forecast
-
-worst_MAPE <- max(MAPE)
-worst_MAPE_position <- which(MAPE == worst_MAPE)
-worst_forecast <- gbm[, worst_MAPE_position]
-
-df_compare <- data.frame(actual = close_price_july,
-                         b_forecast = best_forecast,
-                         w_forecast = worst_forecast,
-                         date = 1:30)
+worst_ols <- max(ols)
+worst_ols_position <- which(ols == worst_ols)
+worst_forecast <- gbm[, worst_ols_position]
 
 ggplot(df_compare, aes(date, AAPL)) +
   geom_line() +
