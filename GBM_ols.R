@@ -72,6 +72,11 @@ worst_ols <- max(ols)
 worst_ols_position <- which(ols == worst_ols)
 worst_forecast <- gbm[, worst_ols_position]
 
+df_compare <- data.frame(actual = close_price_july,
+                         b_forecast = best_forecast,
+                         w_forecast = worst_forecast,
+                         date = 1:30)
+
 lower5 <- exp(log(s0)+(mu-sigma*sigma/2)*1:30+qnorm(0.025)*sigma*sqrt(1:30))
 upper5 <- exp(log(s0)+(mu-sigma*sigma/2)*1:30+qnorm(0.975)*sigma*sqrt(1:30))
 df_confint5 <- data.frame(ix = 1:30,
