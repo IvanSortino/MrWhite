@@ -56,7 +56,7 @@ for (i in 1:ncol(gbm)) {
   diff_mat[, i] <- close_price_july - gbm[, i]
 }
 
-MAPE <- abs(colSums(diff_mat) / nrow(diff_mat))
+MAPE <- abs(colSums(diff_mat)) ^ 2
 best_MAPE <- min(MAPE)
 best_MAPE_position <- which(MAPE == best_MAPE)
 best_forecast <- gbm[, best_MAPE_position]
