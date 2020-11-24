@@ -37,7 +37,7 @@ gbm_fun <- function(nsim, t, mu, sigma, S0, dt) {
 }
 
 gbm <- gbm_fun(50, 30, mu, sigma, s0, 1)
-
+set.seed(123)
 gbm_df <- as.data.frame(gbm) %>%
   mutate(ix = 1:nrow(gbm)) %>%
   pivot_longer(-ix, names_to = 'sim', values_to = 'price')
