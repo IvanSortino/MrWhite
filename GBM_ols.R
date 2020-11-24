@@ -72,6 +72,18 @@ worst_ols <- max(ols)
 worst_ols_position <- which(ols == worst_ols)
 worst_forecast <- gbm[, worst_ols_position]
 
+lower5 <- exp(log(s0)+(mu-sigma*sigma/2)*1:30+qnorm(0.025)*sigma*sqrt(1:30))
+upper5 <- exp(log(s0)+(mu-sigma*sigma/2)*1:30+qnorm(0.975)*sigma*sqrt(1:30))
+df_confint5 <- data.frame(ix = 1:30,
+                         l_95 = lower5,
+                         u_95 = upper5)
+
+lower1 <- exp(log(s0)+(mu-sigma*sigma/2)*1:30+qnorm(0.005)*sigma*sqrt(1:30))
+upper1 <- exp(log(s0)+(mu-sigma*sigma/2)*1:30+qnorm(0.995)*sigma*sqrt(1:30))
+df_confint1 <- data.frame(ix = 1:30,
+                         l_99 = lower1,
+                         u_99 = upper1)
+
 ggplot(df_compare, aes(date, AAPL)) +
   geom_line() +
   geom_line(aes(date, b_forecast), col = 'green') +
@@ -80,27 +92,6 @@ ggplot(df_compare, aes(date, AAPL)) +
   geom_line(data = df_confint5, aes(ix,u_95), linetype= 'longdash') +
   geom_line(data = df_confint1, aes(ix,l_99)) +
   geom_line(data = df_confint1, aes(ix,u_99))
-
-  
-
-# Vorrei dimostrare che S_t si distribuiscono come una lognormale 
-
-# Intervallo di confidenza
-
-lower5 <- exp(log(s0)+(mu-sigma*sigma/2)*1:30+qnorm(0.025)*sigma*sqrt(1:30))
-upper5 <- exp(log(s0)+(mu-sigma*sigma/2)*1:30+qnorm(0.975)*sigma*sqrt(1:30))
-df_confint5 <- data.frame(ix = 1:30,
-                         l_95 = lower5,
-                         u_95 = upper5)
-lower1 <- exp(log(s0)+(mu-sigma*sigma/2)*1:30+qnorm(0.005)*sigma*sqrt(1:30))
-upper1 <- exp(log(s0)+(mu-sigma*sigma/2)*1:30+qnorm(0.995)*sigma*sqrt(1:30))
-df_confint1 <- data.frame(ix = 1:30,
-                         l_99 = lower1,
-                         u_99 = upper1)
-
-
-
-## Vorrei aggiungerlo al grafico delle simulazione dei diversi GBM
 
 ggplot() +
   geom_line(data = gbm_df ,aes(x=ix, y=price, color=sim)) +
